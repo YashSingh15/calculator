@@ -58,3 +58,10 @@ body {
     padding-left: 36px;
     border-radius: 50px;
 }
+
+.display {
+    font-size: 6rem;
+    color: white;
+    text-align: right;
+    padding-right: 25px;
+}
