@@ -30,9 +30,15 @@ function operate(operand1, operator, operand2) {
 function updateDisplay(e) {
     const display = document.querySelector('.display');
     const selectedButtonText = e.target.textContent;
-    
-    if (selectedButtonText.match(/\d/)) {
+
+    // two paths
+    // if display shows single 0, then replace that
+    // if display shows any other number or combination of numbers, add to that list
+
+    if (display.textContent === '0') {
         display.textContent = selectedButtonText;
+    } else {
+        display.textContent += selectedButtonText;
     }
 }
 
