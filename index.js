@@ -10,6 +10,7 @@ const PLUS_MINUS = '±';
 let result = 0;
 let operator = '';
 let newEntry = false;
+let gotResult = false;
 
 function add(num1, num2) {
     return num1 + num2;
@@ -49,6 +50,10 @@ function isOperator(text) {
     return operators.includes(text);
 }
 
+function isUtility(text) {
+    const utilities = [PLUS_MINUS, '%'];
+    return utilities.includes(text);
+}
 
 function updateDisplay(e) {
     const selectedButtonText = e.target.textContent;
@@ -67,6 +72,19 @@ function updateDisplay(e) {
         return;
     }
 
+    if (isUtility(selectedButtonText)) {
+        const utility = selectedButtonText;
+        if (utility === '%') {
+            result = +display.textContent / 100;
+            display.textContent = result;
+        } else if (utility === PLUS_MINUS) {
+            result = -(+display.textContent);
+            display.textContent = result;
+        }
+
+        return;
+    }
+
     if (selectedButtonText === EQUALS) {
         if (operator === '') {
             return;
@@ -79,6 +97,7 @@ function updateDisplay(e) {
         display.textContent = result;
 
         operator = '';
+        gotResult = true;
         return;
     }
 
@@ -89,7 +108,12 @@ function updateDisplay(e) {
             clearDisplay();
             display.textContent = selectedButtonText;
             newEntry = false;
-        } else {
+        } else if (gotResult) {
+            clearDisplay();
+            display.textContent = selectedButtonText;
+            gotResult = false;
+        }
+        else {
             display.textContent += selectedButtonText;
         }
     }
