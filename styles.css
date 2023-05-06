@@ -30,6 +30,7 @@ body {
     margin: 10px;
 }
 
+.utility-button,
 .digit-button,
 .operator-button {
     width: 100px;
@@ -40,6 +41,11 @@ body {
     color: white;
     text-align: center;
     margin: 5px;
+}
+
+.utility-button {
+    background-color: #a5a5a5;
+    color: black;
 }
 
 .operator-button {
