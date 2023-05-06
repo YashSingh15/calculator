@@ -26,3 +26,18 @@ function operate(operand1, operator, operand2) {
             return divide(num1, num2)
     }
 }
+
+function updateDisplay(e) {
+    const display = document.querySelector('.display');
+    const selectedButtonText = e.target.textContent;
+    
+    if (selectedButtonText.match(/\d/)) {
+        display.textContent = selectedButtonText;
+    }
+}
+
+const buttons = document.querySelectorAll('button');
+
+for (const button of buttons) {
+    button.addEventListener('click', updateDisplay);
+}
