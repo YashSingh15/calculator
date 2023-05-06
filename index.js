@@ -27,9 +27,19 @@ function operate(operand1, operator, operand2) {
     }
 }
 
+function clearDisplay() {
+    const display = document.querySelector('.display');
+    display.textContent = '0';
+}
+
 function updateDisplay(e) {
     const display = document.querySelector('.display');
     const selectedButtonText = e.target.textContent;
+
+    if (selectedButtonText === 'AC') {
+        clearDisplay();
+        return;
+    }
 
     // two paths
     // if display shows single 0, then replace that
