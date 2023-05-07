@@ -55,9 +55,7 @@ function isUtility(text) {
     return utilities.includes(text);
 }
 
-function updateDisplay(e) {
-    const selectedButtonText = e.target.textContent;
-
+function updateDisplay(selectedButtonText) {
     if (selectedButtonText === 'AC') {
         result = 0;
         operator = '';
@@ -66,7 +64,7 @@ function updateDisplay(e) {
     }
 
     if (isOperator(selectedButtonText)) {
-        result = +display.textContent;
+        result += +display.textContent;
         operator = selectedButtonText;
         newEntry = true;
         return;
@@ -102,6 +100,10 @@ function updateDisplay(e) {
     }
 
     if (display.textContent === '0') {
+        if (selectedButtonText === 'Backspace') {
+            return;
+        }
+
         display.textContent = selectedButtonText;
     } else {
         if (newEntry) {
@@ -114,13 +116,48 @@ function updateDisplay(e) {
             gotResult = false;
         }
         else {
+            if (selectedButtonText === 'Backspace') {
+                if (display.textContent.length === 1) {
+                    display.textContent = '0';
+                    return;
+                }
+
+                display.textContent = display.textContent.slice(0, -1);
+                return;
+            }
             display.textContent += selectedButtonText;
         }
+    }
+}
+
+function updateDisplayButton(e) {
+    const selectedButtonText = e.target.textContent;
+    updateDisplay(selectedButtonText);
+}
+
+function updateDisplayKeyboard(e) {
+    const allowedButtons = [
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Backspace',
+        ADD, SUBTRACT, MULTIPLY, DIVIDE, EQUALS, PLUS_MINUS,
+    ];
+
+    if (allowedButtons.includes(e.key)) {
+        updateDisplay(e.key);
+    }
+
+    if (e.key === 'Enter') {
+        updateDisplay(EQUALS);
+    }
+
+    if (e.key === 'Escape') {
+        updateDisplay('AC');
     }
 }
 
 const buttons = document.querySelectorAll('button');
 
 for (const button of buttons) {
-    button.addEventListener('click', updateDisplay);
+    button.addEventListener('click', updateDisplayButton);
 }
+
+document.addEventListener('keydown', updateDisplayKeyboard);
