@@ -12,6 +12,8 @@ let operator = '+';
 let firstEntry = true;
 let newEntry = false;
 let gotResult = false;
+let allowBackspace = true;
+let decimalExists = false;
 
 function add(num1, num2) {
     return num1 + num2;
@@ -44,6 +46,7 @@ function operate(num1, operator, num2) {
 
 function clearDisplay() {
     display.textContent = '0';
+    decimalExists = false;
 }
 
 function isOperator(text) {
@@ -55,81 +58,6 @@ function isUtility(text) {
     const utilities = [PLUS_MINUS, '%'];
     return utilities.includes(text);
 }
-
-// function updateDisplay(selectedButtonText) {
-//     if (selectedButtonText === 'AC') {
-//         result = 0;
-//         operator = '';
-//         clearDisplay();
-//         return;
-//     }
-
-//     if (isOperator(selectedButtonText)) {
-//         operator = selectedButtonText;
-//         result = operate(result, operator, +display.textContent);
-//         display.textContent = result;
-//         newEntry = true;
-//         return;
-//     }
-
-//     if (isUtility(selectedButtonText)) {
-//         const utility = selectedButtonText;
-//         if (utility === '%') {
-//             result = +display.textContent / 100;
-//             display.textContent = result;
-//         } else if (utility === PLUS_MINUS) {
-//             result = -(+display.textContent);
-//             display.textContent = result;
-//         }
-
-//         return;
-//     }
-
-//     if (selectedButtonText === EQUALS) {
-//         if (operator === '') {
-//             return;
-//         }
-
-//         const num1 = result;
-//         const num2 = +display.textContent;
-
-//         result = operate(num1, operator, num2);
-//         display.textContent = result;
-
-//         operator = '';
-//         gotResult = true;
-//         return;
-//     }
-
-//     if (display.textContent === '0') {
-//         if (selectedButtonText === 'Backspace') {
-//             return;
-//         }
-
-//         display.textContent = selectedButtonText;
-//     } else {
-//         if (newEntry) {
-//             clearDisplay();
-//             display.textContent = selectedButtonText;
-//             newEntry = false;
-//         } else if (gotResult) {
-//             clearDisplay();
-//             display.textContent = selectedButtonText;
-//             gotResult = false;
-//         } else {
-//             if (selectedButtonText === 'Backspace') {
-//                 if (display.textContent.length === 1) {
-//                     display.textContent = '0';
-//                     return;
-//                 }
-
-//                 display.textContent = display.textContent.slice(0, -1);
-//                 return;
-//             }
-//             display.textContent += selectedButtonText;
-//         }
-//     }
-// }
 
 function isDigit(text) {
     const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -146,15 +74,28 @@ function handleInput(selectedButtonText) {
         return;
     }
 
+    if (selectedButtonText === '.') {
+        if (decimalExists) {
+            return;
+        }
+
+        display.textContent += selectedButtonText;
+        decimalExists = true;
+    }
+
     if (isDigit(selectedButtonText)) {
         if (firstEntry) {
             display.textContent = selectedButtonText;
             firstEntry = false;
+            allowBackspace = true;
         } else if (newEntry) {
             display.textContent = selectedButtonText;
+            decimalExists = false;
             newEntry = false;
+            allowBackspace = true;
         } else {
             display.textContent += selectedButtonText;
+            allowBackspace = true;
         }
     } else if (isOperator(selectedButtonText)) {
         const num = +display.textContent;
@@ -162,6 +103,7 @@ function handleInput(selectedButtonText) {
         display.textContent = result;
         operator = selectedButtonText;
         newEntry = true;
+        allowBackspace = false;
     } else if (isUtility(selectedButtonText)) {
         const utility = selectedButtonText;
         if (utility === '%') {
@@ -171,12 +113,32 @@ function handleInput(selectedButtonText) {
             result = -(+display.textContent);
             display.textContent = result;
         }
+
+        allowBackspace = false;
     } else if (selectedButtonText === EQUALS) {
         const num = +display.textContent;
         result = operate(result, operator, num);
         display.textContent = result;
         result = 0;
         operator = '+';
+        newEntry = true;
+        allowBackspace = false;
+    } else if (selectedButtonText === 'Backspace') {
+        if (newEntry) {
+            return;
+        }
+
+        if (!allowBackspace) {
+            return;
+        }
+
+        if (display.textContent.length === 1) {
+            newEntry = true;
+            clearDisplay();
+            return;
+        }
+
+        display.textContent = display.textContent.slice(0, -1);
     }
 }
 
