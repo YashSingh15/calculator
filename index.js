@@ -8,7 +8,8 @@ const EQUALS = '=';
 const PLUS_MINUS = '±';
 
 let result = 0;
-let operator = '';
+let operator = '+';
+let firstEntry = true;
 let newEntry = false;
 let gotResult = false;
 
@@ -55,22 +56,113 @@ function isUtility(text) {
     return utilities.includes(text);
 }
 
-function updateDisplay(selectedButtonText) {
+// function updateDisplay(selectedButtonText) {
+//     if (selectedButtonText === 'AC') {
+//         result = 0;
+//         operator = '';
+//         clearDisplay();
+//         return;
+//     }
+
+//     if (isOperator(selectedButtonText)) {
+//         operator = selectedButtonText;
+//         result = operate(result, operator, +display.textContent);
+//         display.textContent = result;
+//         newEntry = true;
+//         return;
+//     }
+
+//     if (isUtility(selectedButtonText)) {
+//         const utility = selectedButtonText;
+//         if (utility === '%') {
+//             result = +display.textContent / 100;
+//             display.textContent = result;
+//         } else if (utility === PLUS_MINUS) {
+//             result = -(+display.textContent);
+//             display.textContent = result;
+//         }
+
+//         return;
+//     }
+
+//     if (selectedButtonText === EQUALS) {
+//         if (operator === '') {
+//             return;
+//         }
+
+//         const num1 = result;
+//         const num2 = +display.textContent;
+
+//         result = operate(num1, operator, num2);
+//         display.textContent = result;
+
+//         operator = '';
+//         gotResult = true;
+//         return;
+//     }
+
+//     if (display.textContent === '0') {
+//         if (selectedButtonText === 'Backspace') {
+//             return;
+//         }
+
+//         display.textContent = selectedButtonText;
+//     } else {
+//         if (newEntry) {
+//             clearDisplay();
+//             display.textContent = selectedButtonText;
+//             newEntry = false;
+//         } else if (gotResult) {
+//             clearDisplay();
+//             display.textContent = selectedButtonText;
+//             gotResult = false;
+//         } else {
+//             if (selectedButtonText === 'Backspace') {
+//                 if (display.textContent.length === 1) {
+//                     display.textContent = '0';
+//                     return;
+//                 }
+
+//                 display.textContent = display.textContent.slice(0, -1);
+//                 return;
+//             }
+//             display.textContent += selectedButtonText;
+//         }
+//     }
+// }
+
+function isDigit(text) {
+    const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    return digits.includes(text);
+}
+
+function handleInput(selectedButtonText) {
     if (selectedButtonText === 'AC') {
         result = 0;
-        operator = '';
+        operator = '+';
         clearDisplay();
+        firstEntry = true;
+        newEntry = false;
         return;
     }
 
-    if (isOperator(selectedButtonText)) {
-        result += +display.textContent;
+    if (isDigit(selectedButtonText)) {
+        if (firstEntry) {
+            display.textContent = selectedButtonText;
+            firstEntry = false;
+        } else if (newEntry) {
+            display.textContent = selectedButtonText;
+            newEntry = false;
+        } else {
+            display.textContent += selectedButtonText;
+        }
+    } else if (isOperator(selectedButtonText)) {
+        const num = +display.textContent;
+        result = operate(result, operator, num);
+        display.textContent = result;
         operator = selectedButtonText;
         newEntry = true;
-        return;
-    }
-
-    if (isUtility(selectedButtonText)) {
+    } else if (isUtility(selectedButtonText)) {
         const utility = selectedButtonText;
         if (utility === '%') {
             result = +display.textContent / 100;
@@ -79,60 +171,18 @@ function updateDisplay(selectedButtonText) {
             result = -(+display.textContent);
             display.textContent = result;
         }
-
-        return;
-    }
-
-    if (selectedButtonText === EQUALS) {
-        if (operator === '') {
-            return;
-        }
-
-        const num1 = result;
-        const num2 = +display.textContent;
-
-        result = operate(num1, operator, num2);
+    } else if (selectedButtonText === EQUALS) {
+        const num = +display.textContent;
+        result = operate(result, operator, num);
         display.textContent = result;
-
-        operator = '';
-        gotResult = true;
-        return;
-    }
-
-    if (display.textContent === '0') {
-        if (selectedButtonText === 'Backspace') {
-            return;
-        }
-
-        display.textContent = selectedButtonText;
-    } else {
-        if (newEntry) {
-            clearDisplay();
-            display.textContent = selectedButtonText;
-            newEntry = false;
-        } else if (gotResult) {
-            clearDisplay();
-            display.textContent = selectedButtonText;
-            gotResult = false;
-        }
-        else {
-            if (selectedButtonText === 'Backspace') {
-                if (display.textContent.length === 1) {
-                    display.textContent = '0';
-                    return;
-                }
-
-                display.textContent = display.textContent.slice(0, -1);
-                return;
-            }
-            display.textContent += selectedButtonText;
-        }
+        result = 0;
+        operator = '+';
     }
 }
 
 function updateDisplayButton(e) {
     const selectedButtonText = e.target.textContent;
-    updateDisplay(selectedButtonText);
+    handleInput(selectedButtonText);
 }
 
 function updateDisplayKeyboard(e) {
@@ -142,15 +192,15 @@ function updateDisplayKeyboard(e) {
     ];
 
     if (allowedButtons.includes(e.key)) {
-        updateDisplay(e.key);
+        handleInput(e.key);
     }
 
     if (e.key === 'Enter') {
-        updateDisplay(EQUALS);
+        handleInput(EQUALS);
     }
 
     if (e.key === 'Escape') {
-        updateDisplay('AC');
+        handleInput('AC');
     }
 }
 
